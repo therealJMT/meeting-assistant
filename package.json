@@ -17,12 +17,15 @@
     "node": ">=22.13.0"
   },
   "dependencies": {
+    "@chat-adapter/slack": "^4.21.0",
+    "@chat-adapter/state-memory": "^4.21.0",
     "@mastra/core": "^1.15.0",
     "@mastra/evals": "^1.1.2",
     "@mastra/libsql": "^1.7.1",
     "@mastra/loggers": "^1.0.3",
     "@mastra/memory": "^1.9.0",
     "@mastra/observability": "^1.5.1",
+    "chat": "^4.21.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -1,8 +1,9 @@
 import { Agent } from '@mastra/core/agent';
+import { Memory } from '@mastra/memory';
 
 export const meetingAssistant = new Agent({
-  id: 'meeting-Assistantt',
-  name: 'meeting-Assistantt',
+  id: 'meeting-Assistant',
+  name: 'meeting-Assistant',
   instructions: `
     You are a personal meeting assistant. Your job is to help your user prepare for
     meetings by researching the people they're meeting with and providing concise,
@@ -20,5 +21,10 @@ export const meetingAssistant = new Agent({
     - If you don't know something, say so — don't make things up
   `,
   model: 'google/gemini-3.1-flash-lite-preview',
-
+  memory: new Memory({
+    options: {
+      workingMemory: { enabled: true },
+      lastMessages: 20,
+    },
+  }),
 });
