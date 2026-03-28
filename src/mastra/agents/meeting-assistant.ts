@@ -1,6 +1,8 @@
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
-import { exaSearchTool } from '../tools/research-tools';
+import { searchWeb } from '../tools/research-tools';
+import { LibSQLVector } from '@mastra/libsql';
+import { fastembed } from '@mastra/fastembed';
 
 export const meetingAssistant = new Agent({
   id: 'meeting-Assistant',
@@ -22,10 +24,38 @@ export const meetingAssistant = new Agent({
     - If you don't know something, say so — don't make things up
   `,
   model: 'google/gemini-3.1-flash-lite-preview',
-  tools: { exaSearchTool },
+  tools: { searchWeb },
   memory: new Memory({
+
+    vector: new LibSQLVector({
+      id: "memory-vector",
+      url: "file:./mastra.db",
+    }
+
+    ),
+
+    embedder: fastembed,
+
     options: {
-      workingMemory: { enabled: true },
+
+      semanticRecall: {
+        topK: 3,
+        messageRange: 2,
+      },
+
+      workingMemory: { 
+        enabled: true,
+        template: `# User Profile
+        - Name:
+        - Role:
+        - Company:
+
+        # Preferences
+        - Communication style:
+        - Meeting pre preferences:
+        - Topics of interest:
+        `,
+       },
       lastMessages: 20,
     },
   }),

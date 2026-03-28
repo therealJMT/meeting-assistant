@@ -26,7 +26,7 @@ bot.onNewMention(async (thread, message) => {
       thread: thread.id,
       // Fixed resource ID so working memory (your profile) is shared
       // across all channels, not isolated per channel
-      resource: "user",
+      resource: "thread.channelId",
     },
   });
   await thread.post(result.text);
@@ -40,7 +40,7 @@ bot.onSubscribedMessage(async (thread, message) => {
       thread: thread.id,
       // Fixed resource ID so working memory (your profile) is shared
       // across all channels, not isolated per channel
-      resource: "user",
+      resource: "thread.channelId",
     },
   });
   await thread.post(result.text);

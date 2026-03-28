@@ -1,53 +1,33 @@
-import { createTool } from '@mastra/core/tools';
-import { z } from 'zod';
-import Exa from 'exa-js';
+import { createTool } from "@mastra/core/tools";
+import { z } from "zod";
+import Exa from "exa-js";
 
-const exa = new Exa(process.env.EXA_API_KEY);
+function getExa() {
+  const apiKey = process.env.EXA_API_KEY;
+  if (!apiKey) throw new Error("EXA_API_KEY is not set");
+  return new Exa(apiKey);
+}
 
-export const exaSearchTool = createTool({
-  id: 'exa-search',
-  description: 'Search the web for current information, research people, companies, and topics. Use this when you need up-to-date information from the internet.',
+export const searchWeb = createTool({
+  id: "search-web",
+  description:
+    "Search the web for information about a person, company, or topic",
   inputSchema: z.object({
-    query: z.string().describe('The search query'),
-    type: z.enum(['fast', 'auto', 'deep', 'deep-reasoning']).optional().default('auto'),
-    numResults: z.number().optional().default(10),
-    category: z.enum(['people', 'company', 'news', 'research paper']).optional(),
-    text: z.object({
-      maxCharacters: z.number().optional(),
-    }).optional(),
-    highlights: z.object({
-      maxCharacters: z.number().optional(),
-    }).optional(),
-    maxAgeHours: z.number().optional(),
+    query: z.string().describe("Search query"),
+    numResults: z.number().optional().default(5),
   }),
-  outputSchema: z.object({
-    results: z.array(z.object({
-      title: z.string(),
-      url: z.string(),
-      snippet: z.string().optional(),
-      publishedDate: z.string().optional(),
-    })),
-  }),
-  execute: async (input) => {
-    const { query, type, numResults, category, text, highlights, maxAgeHours } = input;
-
-    const results = await exa.searchAndContents(query, {
-      type: type || 'auto',
-      numResults: numResults || 10,
-      category,
-      contents: text
-        ? { text: { maxCharacters: text.maxCharacters || 20000 } }
-        : { highlights: { maxCharacters: highlights?.maxCharacters || 4000 } },
-      maxAgeHours,
+  execute: async (inputData) => {
+    const exa = getExa();
+    const result = await exa.searchAndContents(inputData.query, {
+      numResults: inputData.numResults,
+      text: { maxCharacters: 2000 },
+      livecrawl: "fallback",
     });
 
-    return {
-      results: results.results.map((r: any) => ({
-        title: r.title,
-        url: r.url,
-        snippet: r.highlights?.[0] || r.text?.substring(0, 500),
-        publishedDate: r.publishedDate,
-      })),
-    };
+    return result.results.map((r) => ({
+      title: r.title,
+      url: r.url,
+      text: r.text,
+    }));
   },
 });
