@@ -1,5 +1,6 @@
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
+import { exaSearchTool } from '../tools/research-tools';
 
 export const meetingAssistant = new Agent({
   id: 'meeting-Assistant',
@@ -10,7 +11,7 @@ export const meetingAssistant = new Agent({
     actionable briefs.
 
     When given information about an upcoming meeting:
-    - Research the person and their company
+    - Research the person and their company using the exa-search tool
     - Summarize who they are, what they do, and why the meeting matters
     - Highlight any talking points or areas of mutual interest
     - Keep briefs concise and scannable — bullet points over paragraphs
@@ -21,6 +22,7 @@ export const meetingAssistant = new Agent({
     - If you don't know something, say so — don't make things up
   `,
   model: 'google/gemini-3.1-flash-lite-preview',
+  tools: { exaSearchTool },
   memory: new Memory({
     options: {
       workingMemory: { enabled: true },
